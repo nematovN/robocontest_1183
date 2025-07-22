@@ -1,0 +1,70 @@
+from collections import deque
+
+def simulate_blooming():
+    global n, k, left_limit, right_limit, vase_heights, bloom_indices
+    
+    # n va k ni o‘qish
+    n, k = map(int, input().split())
+    
+    # vase_heights massivini boshlash
+    MAX_N = 1000000
+    INF = MAX_N + 3
+    vase_heights = [0] * (MAX_N + 5)
+    vase_heights[0] = vase_heights[n + 1] = INF
+    vase_heights[n + 1] += 1
+    
+    # Vaza balandliklarini o‘qish
+    heights = list(map(int, input().split()))
+    for i in range(1, n + 1):
+        vase_heights[i] = heights[i - 1]
+    
+    # bloom_indices deque ni boshlash
+    bloom_indices = deque([k])
+    
+    # Yo‘nalishni aniqlash
+    move_right = (k == 1 or vase_heights[k - 1] > vase_heights[k])
+    
+    # left_limit va right_limit ni boshlash
+    left_limit = right_limit = bloom_indices[-1]
+    
+    # bloom_order ro‘yxatini boshlash
+    bloom_order = []
+    
+    while 1 <= left_limit or right_limit <= n:
+        if move_right:
+            right_limit += 1
+            current = right_limit
+            while len(bloom_indices) > 1:
+                if vase_heights[bloom_indices[-1]] < vase_heights[current]:
+                    bloom_order.append(bloom_indices[-1])
+                    bloom_indices.pop()
+                else:
+                    break
+            if len(bloom_indices) == 1 and vase_heights[bloom_indices[0]] < vase_heights[current]:
+                move_right = not move_right
+            bloom_indices.append(current)
+        else:
+            left_limit -= 1
+            current = left_limit
+            while len(bloom_indices) > 1:
+                if vase_heights[bloom_indices[0]] < vase_heights[current]:
+                    bloom_order.append(bloom_indices[0])
+                    bloom_indices.popleft()
+                else:
+                    break
+            if len(bloom_indices) == 1 and vase_heights[bloom_indices[0]] < vase_heights[current]:
+                move_right = not move_right
+            bloom_indices.appendleft(current)
+    
+    # Natijalarni chiqarish
+    for i in range(n):
+        print(bloom_order[i], end=" \n"[i == n - 1])
+
+def main():
+    test_cases = 1
+    for _ in range(test_cases):
+        simulate_blooming()
+        print()
+
+if __name__ == "__main__":
+    main()
